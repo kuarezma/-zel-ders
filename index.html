@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ders Yönetimi">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="description" content="Özel ders veren öğretmenler için ders ve ücret takip sistemi">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%233b82f6' width='180' height='180'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>📚</text></svg>">
+    <title>Özel Ders Yönetimi - Ders & Ücret Takibi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Safe Area Support for iPhone */
+        html {
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+            --text: #374151;
+            --text-light: #6b7280;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            padding-top: max(15px, env(safe-area-inset-top));
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .header h1 i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-top: 3px;
+            letter-spacing: 0.3px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        /* FORM STYLES */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--dark);
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px;
+            padding-right: 40px;
+            min-height: 48px;
+        }
+
+        .form-group select {
+            background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 15px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .btn:active {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:active {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 13px;
+            min-height: 40px;
+        }
+
+        /* STUDENT LIST */
+        .students-list {
+            max-height: 400px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .student-item {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border-left: 4px solid var(--primary);
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .student-item:active {
+            background: rgba(59, 130, 246, 0.1);
+            transform: scale(0.98);
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+
+        .student-meta {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* LESSONS TABLE */
+        .lessons-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .lessons-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .lessons-table thead {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .lessons-table th {
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .lessons-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .lessons-table tbody tr:active {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .lesson-row.paid {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .lesson-row.unpaid {
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .checkbox-cell input {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            min-width: 24px;
+        }
+
+        .paid-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .paid-badge.yes {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .paid-badge.no {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .amount {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+            border-left-color: var(--success);
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+            border-left-color: var(--warning);
+        }
+
+        .stat-card.danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+            border-left-color: var(--danger);
+        }
+
+        .stat-card-title {
+            font-size: 11px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-card-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+
+        .stat-card-meta {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 14px;
+            white-space: nowrap;
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tab-btn:active {
+            opacity: 0.7;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* WEEKLY/MONTHLY STATS */
+        .time-period-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .time-stat {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .time-stat h4 {
+            color: var(--text-light);
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .time-stat .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .time-stat .meta {
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        /* FILTERS */
+        .filter-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--border);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: flex-end;
+            justify-content: center;
+            padding: env(safe-area-inset-bottom);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-light);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header-stats {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .time-period-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+
+            body {
+                padding: 10px;
+                padding-top: max(10px, env(safe-area-inset-top));
+                padding-bottom: max(80px, env(safe-area-inset-bottom));
+            }
+
+            .header {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            .card {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .card-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+
+            .lessons-table {
+                font-size: 11px;
+            }
+
+            .lessons-table th,
+            .lessons-table td {
+                padding: 6px 4px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 10px 14px;
+            }
+
+            .time-period-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .time-stat {
+                padding: 10px;
+            }
+
+            .modal-content {
+                max-height: 95vh;
+                padding: 15px;
+            }
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-light);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .danger-text {
+            color: var(--danger);
+        }
+
+        .success-text {
+            color: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-book-open"></i>
+                Özel Ders Yönetim Sistemi
+            </h1>
+            <div class="header-stats">
+                <div class="stat">
+                    <div class="stat-value" id="total-students">0</div>
+                    <div class="stat-label">Öğrenci</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="total-lessons">0</div>
+                    <div class="stat-label">Toplam Ders</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="total-hours">0</div>
+                    <div class="stat-label">Saat</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value success-text" id="total-earned">₺0</div>
+                    <div class="stat-label">Toplam Kazanç</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- LEFT COLUMN -->
+            <div>
+                <!-- ADD STUDENT & LESSON -->
+                <div class="card" style="margin-bottom: 30px;">
+                    <div class="card-title">
+                        <i class="fas fa-user-plus"></i>
+                        Yeni Öğrenci / Ders Ekle
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab('add-student')">Öğrenci Ekle</button>
+                        <button class="tab-btn" onclick="switchTab('add-lesson')">Ders Ekle</button>
+                    </div>
+
+                    <!-- ADD STUDENT TAB -->
+                    <div id="add-student" class="tab-content active">
+                        <form onsubmit="addStudent(event)">
+                            <div class="form-group">
+                                <label>Öğrenci Adı *</label>
+                                <input type="text" id="student-name" required placeholder="Örn: Ahmet Yılmaz">
+                            </div>
+                            <div class="form-group">
+                                <label>Saat Ücreti (₺) *</label>
+                                <input type="number" id="student-hourly-rate" required placeholder="Örn: 100" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon (Opsiyonel)</label>
+                                <input type="tel" id="student-phone" placeholder="+90 505 XXX XX XX">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-plus"></i> Öğrenci Ekle
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- ADD LESSON TAB -->
+                    <div id="add-lesson" class="tab-content">
+                        <form onsubmit="addLesson(event)">
+                            <div class="form-group">
+                                <label>Öğrenci Seç *</label>
+                                <select id="lesson-student" required onchange="updateLessonRate()">
+                                    <option value="">-- Öğrenci Seçin --</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Ders Tarihi *</label>
+                                    <input type="date" id="lesson-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Saat Ücreti (₺) *</label>
+                                    <input type="number" id="lesson-rate" required placeholder="0" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Başlangıç Saati *</label>
+                                    <input type="time" id="lesson-start" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Bitiş Saati *</label>
+                                    <input type="time" id="lesson-end" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Ders Açıklaması (Opsiyonel)</label>
+                                <input type="text" id="lesson-notes" placeholder="Örn: Matematik - Türev">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-plus"></i> Ders Ekle
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- LESSONS LIST -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-list"></i>
+                        Ders Listesi
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="form-group" style="margin: 0;">
+                            <label style="font-size: 12px;">Öğrenci Filtrele</label>
+                            <select id="filter-student" onchange="filterLessons()">
+                                <option value="">Tüm Öğrenciler</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label style="font-size: 12px;">Ödeme Durumu</label>
+                            <select id="filter-status" onchange="filterLessons()">
+                                <option value="">Tüm Öğdemeler</option>
+                                <option value="paid">Ödenen Dersler</option>
+                                <option value="unpaid">Ödenmemiş Dersler</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label style="font-size: 12px;">Ay Seçin</label>
+                            <input type="month" id="filter-month" onchange="filterLessons()">
+                        </div>
+                    </div>
+
+                    <div class="lessons-wrapper">
+                        <table class="lessons-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Tarih</th>
+                                    <th style="width: 120px;">Öğrenci</th>
+                                    <th style="width: 80px;">Saat</th>
+                                    <th style="width: 100px;">Ücret</th>
+                                    <th style="width: 80px;">Ödendi?</th>
+                                    <th style="width: 150px;">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lessons-tbody">
+                                <tr>
+                                    <td colspan="6" class="text-center" style="padding: 40px;">
+                                        <div class="empty-state">
+                                            <i class="fas fa-inbox"></i>
+                                            <p>Henüz ders kaydı yok</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div>
+                <!-- SUMMARY -->
+                <div class="card" style="margin-bottom: 30px;">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Hızlı Özet
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-title">Bu Ay - Toplam Ders Saati</div>
+                            <div class="stat-card-value" id="month-hours">0</div>
+                            <div class="stat-card-meta">saat</div>
+                        </div>
+
+                        <div class="stat-card success">
+                            <div class="stat-card-title">Bu Ay - Ödenen Miktar</div>
+                            <div class="stat-card-value" id="month-paid">₺0</div>
+                            <div class="stat-card-meta">nakit alındı</div>
+                        </div>
+
+                        <div class="stat-card warning">
+                            <div class="stat-card-title">Bu Ay - Bekleme (Ödenmemiş)</div>
+                            <div class="stat-card-value" id="month-unpaid">₺0</div>
+                            <div class="stat-card-meta">henüz tahsil edilmemiş</div>
+                        </div>
+
+                        <div class="stat-card danger">
+                            <div class="stat-card-title">Bu Hafta - Toplam Ders</div>
+                            <div class="stat-card-value" id="week-lessons">0</div>
+                            <div class="stat-card-meta">ders sayısı</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 25px; margin-bottom: 15px; color: var(--dark); font-size: 14px;">
+                        <i class="fas fa-users"></i> Öğrenci Listesi
+                    </h3>
+                    <div class="students-list" id="students-list">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p style="font-size: 12px;">Henüz öğrenci eklenmedi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATISTICS -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-bar-chart"></i>
+                        İstatistikler
+                    </div>
+
+                    <div class="time-period-stats">
+                        <div class="time-stat">
+                            <h4>Bu Hafta</h4>
+                            <div class="value" id="week-hours">0</div>
+                            <div class="meta">saat</div>
+                        </div>
+                        <div class="time-stat">
+                            <h4>Bu Hafta Kazanç</h4>
+                            <div class="value" id="week-earnings">₺0</div>
+                            <div class="meta">toplam</div>
+                        </div>
+                        <div class="time-stat">
+                            <h4>Bu Ay</h4>
+                            <div class="value" id="month-total-hours">0</div>
+                            <div class="meta">saat</div>
+                        </div>
+                        <div class="time-stat">
+                            <h4>Bu Ay Kazanç</h4>
+                            <div class="value" id="month-earnings">₺0</div>
+                            <div class="meta">toplam</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 25px; margin-bottom: 15px; color: var(--dark); font-size: 14px;">
+                        <i class="fas fa-user"></i> Öğrenci Bazında
+                    </h3>
+                    <div id="student-stats" style="max-height: 300px; overflow-y: auto;">
+                        <div class="empty-state">
+                            <p style="font-size: 12px;">Veri bulunmuyor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENT DETAIL MODAL -->
+    <div class="modal" id="student-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-header" id="modal-title">Öğrenci Detayları</div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // DATA STRUCTURE
+        let data = {
+            students: [],
+            lessons: []
+        };
+
+        // LOAD DATA FROM STORAGE
+        function loadData() {
+            const stored = localStorage.getItem('derYonetimData');
+            if (stored) {
+                data = JSON.parse(stored);
+            }
+        }
+
+        // SAVE DATA TO STORAGE
+        function saveData() {
+            localStorage.setItem('derYonetimData', JSON.stringify(data));
+            updateUI();
+        }
+
+        // ADD STUDENT
+        function addStudent(event) {
+            event.preventDefault();
+            const name = document.getElementById('student-name').value;
+            const rate = parseFloat(document.getElementById('student-hourly-rate').value);
+            const phone = document.getElementById('student-phone').value;
+
+            if (!name || rate < 0) return;
+
+            const student = {
+                id: Date.now(),
+                name,
+                hourlyRate: rate,
+                phone,
+                createdAt: new Date().toISOString()
+            };
+
+            data.students.push(student);
+            saveData();
+
+            // Clear form
+            event.target.reset();
+            alert(name + ' başarıyla eklendi!');
+        }
+
+        // ADD LESSON
+        function addLesson(event) {
+            event.preventDefault();
+            const studentId = parseInt(document.getElementById('lesson-student').value);
+            const date = document.getElementById('lesson-date').value;
+            const startTime = document.getElementById('lesson-start').value;
+            const endTime = document.getElementById('lesson-end').value;
+            const rate = parseFloat(document.getElementById('lesson-rate').value);
+            const notes = document.getElementById('lesson-notes').value;
+
+            if (!studentId || !date || !startTime || !endTime || rate < 0) return;
+
+            // Calculate hours
+            const [startH, startM] = startTime.split(':').map(Number);
+            const [endH, endM] = endTime.split(':').map(Number);
+            const startMinutes = startH * 60 + startM;
+            const endMinutes = endH * 60 + endM;
+            const hours = Math.max(0, (endMinutes - startMinutes) / 60);
+
+            if (hours === 0) {
+                alert('Bitiş saati başlangıç saatinden sonra olmalıdır!');
+                return;
+            }
+
+            const lesson = {
+                id: Date.now(),
+                studentId,
+                date,
+                startTime,
+                endTime,
+                hours: parseFloat(hours.toFixed(2)),
+                hourlyRate: rate,
+                amount: parseFloat((hours * rate).toFixed(2)),
+                notes,
+                paid: false,
+                paidAt: null
+            };
+
+            data.lessons.push(lesson);
+            saveData();
+
+            event.target.reset();
+            alert('Ders başarıyla eklendi!');
+        }
+
+        // UPDATE LESSON RATE FROM STUDENT
+        function updateLessonRate() {
+            const studentId = parseInt(document.getElementById('lesson-student').value);
+            if (!studentId) return;
+            const student = data.students.find(s => s.id === studentId);
+            if (student) {
+                document.getElementById('lesson-rate').value = student.hourlyRate;
+            }
+        }
+
+        // MARK AS PAID
+        function togglePaid(lessonId) {
+            const lesson = data.lessons.find(l => l.id === lessonId);
+            if (lesson) {
+                lesson.paid = !lesson.paid;
+                lesson.paidAt = lesson.paid ? new Date().toISOString() : null;
+                saveData();
+            }
+        }
+
+        // DELETE LESSON
+        function deleteLesson(lessonId) {
+            if (confirm('Bu dersi silmek istediğinizden emin misiniz?')) {
+                data.lessons = data.lessons.filter(l => l.id !== lessonId);
+                saveData();
+            }
+        }
+
+        // DELETE STUDENT
+        function deleteStudent(studentId) {
+            if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz? (Tüm dersleri de silinecek)')) {
+                data.students = data.students.filter(s => s.id !== studentId);
+                data.lessons = data.lessons.filter(l => l.studentId !== studentId);
+                saveData();
+            }
+        }
+
+        // SWITCH TABS
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // FILTER LESSONS
+        function filterLessons() {
+            updateUI();
+        }
+
+        // UPDATE UI
+        function updateUI() {
+            updateStudentDropdown();
+            updateStudentsList();
+            updateLessonsTable();
+            updateStats();
+        }
+
+        function updateStudentDropdown() {
+            const select = document.getElementById('lesson-student');
+            const filterSelect = document.getElementById('filter-student');
+
+            select.innerHTML = '<option value="">-- Öğrenci Seçin --</option>';
+            filterSelect.innerHTML = '<option value="">Tüm Öğrenciler</option>';
+
+            data.students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name + ' (₺' + student.hourlyRate + '/saat)';
+                select.appendChild(option);
+
+                const filterOption = document.createElement('option');
+                filterOption.value = student.id;
+                filterOption.textContent = student.name;
+                filterSelect.appendChild(filterOption);
+            });
+        }
+
+        function updateStudentsList() {
+            const container = document.getElementById('students-list');
+
+            if (data.students.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p style="font-size: 12px;">Henüz öğrenci eklenmedi</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = data.students.map(student => {
+                const studentLessons = data.lessons.filter(l => l.studentId === student.id);
+                const totalHours = studentLessons.reduce((sum, l) => sum + l.hours, 0);
+                const totalEarned = studentLessons.reduce((sum, l) => sum + l.amount, 0);
+                const paidAmount = studentLessons.filter(l => l.paid).reduce((sum, l) => sum + l.amount, 0);
+                const unpaidAmount = totalEarned - paidAmount;
+
+                return `
+                    <div class="student-item" onclick="showStudentDetail(${student.id})">
+                        <div class="student-info">
+                            <div class="student-name">${student.name}</div>
+                            <div class="student-meta">
+                                ${studentLessons.length} ders • ${totalHours.toFixed(1)}h • ₺${totalEarned.toFixed(2)}
+                            </div>
+                        </div>
+                        <div class="student-actions">
+                            <button class="btn btn-small btn-secondary" onclick="deleteStudent(${student.id}); event.stopPropagation();">Sil</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateLessonsTable() {
+            const tbody = document.getElementById('lessons-tbody');
+            const filterStudent = document.getElementById('filter-student').value;
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterMonth = document.getElementById('filter-month').value;
+
+            let filtered = data.lessons;
+
+            if (filterStudent) {
+                filtered = filtered.filter(l => l.studentId === parseInt(filterStudent));
+            }
+
+            if (filterStatus === 'paid') {
+                filtered = filtered.filter(l => l.paid);
+            } else if (filterStatus === 'unpaid') {
+                filtered = filtered.filter(l => !l.paid);
+            }
+
+            if (filterMonth) {
+                filtered = filtered.filter(l => l.date.startsWith(filterMonth));
+            }
+
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center" style="padding: 40px;">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>Ders kaydı bulunamadı</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(lesson => {
+                const student = data.students.find(s => s.id === lesson.studentId);
+                const date = new Date(lesson.date);
+                const formattedDate = date.toLocaleDateString('tr-TR');
+
+                return `
+                    <tr class="lesson-row ${lesson.paid ? 'paid' : 'unpaid'}">
+                        <td>${formattedDate}</td>
+                        <td>${student ? student.name : 'Silinmiş'}</td>
+                        <td>${lesson.hours.toFixed(1)}h</td>
+                        <td><span class="amount">₺${lesson.amount.toFixed(2)}</span></td>
+                        <td>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" ${lesson.paid ? 'checked' : ''} onchange="togglePaid(${lesson.id})" class="checkbox-cell">
+                                <span class="paid-badge ${lesson.paid ? 'yes' : 'no'}">
+                                    ${lesson.paid ? '✓ Ödendi' : '✗ Beklemede'}
+                                </span>
+                            </label>
+                        </td>
+                        <td>
+                            <button class="btn btn-small btn-danger" onclick="deleteLesson(${lesson.id})">Sil</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay());
+
+            // Global stats
+            const totalStudents = data.students.length;
+            const totalLessons = data.lessons.length;
+            const totalHours = data.lessons.reduce((sum, l) => sum + l.hours, 0);
+            const totalEarned = data.lessons.reduce((sum, l) => sum + l.amount, 0);
+
+            document.getElementById('total-students').textContent = totalStudents;
+            document.getElementById('total-lessons').textContent = totalLessons;
+            document.getElementById('total-hours').textContent = totalHours.toFixed(1);
+            document.getElementById('total-earned').textContent = '₺' + totalEarned.toFixed(2);
+
+            // Month stats
+            const monthLessons = data.lessons.filter(l => l.date.startsWith(currentMonth));
+            const monthHours = monthLessons.reduce((sum, l) => sum + l.hours, 0);
+            const monthPaid = monthLessons.filter(l => l.paid).reduce((sum, l) => sum + l.amount, 0);
+            const monthUnpaid = monthLessons.reduce((sum, l) => sum + l.amount, 0) - monthPaid;
+
+            document.getElementById('month-hours').textContent = monthHours.toFixed(1);
+            document.getElementById('month-paid').textContent = '₺' + monthPaid.toFixed(2);
+            document.getElementById('month-unpaid').textContent = '₺' + monthUnpaid.toFixed(2);
+            document.getElementById('month-total-hours').textContent = monthHours.toFixed(1);
+            document.getElementById('month-earnings').textContent = '₺' + monthLessons.reduce((sum, l) => sum + l.amount, 0).toFixed(2);
+
+            // Week stats
+            const weekLessons = data.lessons.filter(l => {
+                const d = new Date(l.date);
+                return d >= weekStart;
+            });
+            const weekHours = weekLessons.reduce((sum, l) => sum + l.hours, 0);
+            const weekCount = weekLessons.length;
+
+            document.getElementById('week-lessons').textContent = weekCount;
+            document.getElementById('week-hours').textContent = weekHours.toFixed(1);
+            document.getElementById('week-earnings').textContent = '₺' + weekLessons.reduce((sum, l) => sum + l.amount, 0).toFixed(2);
+
+            // Student stats
+            updateStudentStats();
+        }
+
+        function updateStudentStats() {
+            const container = document.getElementById('student-stats');
+
+            if (data.students.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p style="font-size: 12px;">Veri bulunmuyor</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const stats = data.students.map(student => {
+                const lessons = data.lessons.filter(l => l.studentId === student.id);
+                const hours = lessons.reduce((sum, l) => sum + l.hours, 0);
+                const amount = lessons.reduce((sum, l) => sum + l.amount, 0);
+                const paid = lessons.filter(l => l.paid).reduce((sum, l) => sum + l.amount, 0);
+                const unpaid = amount - paid;
+
+                return {
+                    name: student.name,
+                    hours,
+                    amount,
+                    paid,
+                    unpaid
+                };
+            });
+
+            container.innerHTML = stats.map(stat => `
+                <div style="padding: 12px; border-bottom: 1px solid var(--border); font-size: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">${stat.name}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: var(--text-light);">
+                        <div>📚 ${stat.hours.toFixed(1)}h ders</div>
+                        <div>💰 ₺${stat.amount.toFixed(2)}</div>
+                        <div style="color: var(--success);">✓ ₺${stat.paid.toFixed(2)}</div>
+                        <div style="color: var(--warning);">⏱ ₺${stat.unpaid.toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showStudentDetail(studentId) {
+            const student = data.students.find(s => s.id === studentId);
+            if (!student) return;
+
+            const lessons = data.lessons.filter(l => l.studentId === studentId);
+            const hours = lessons.reduce((sum, l) => sum + l.hours, 0);
+            const amount = lessons.reduce((sum, l) => sum + l.amount, 0);
+            const paid = lessons.filter(l => l.paid).reduce((sum, l) => sum + l.amount, 0);
+            const unpaid = amount - paid;
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: var(--dark); margin-bottom: 10px;">${student.name}</h3>
+                    <p style="color: var(--text-light); margin-bottom: 15px;">Saat Ücreti: <strong>₺${student.hourlyRate}</strong></p>
+                    ${student.phone ? '<p style="color: var(--text-light); margin-bottom: 15px;">Telefon: <strong>' + student.phone + '</strong></p>' : ''}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 2fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05)); padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-light); font-size: 12px; margin-bottom: 5px;">Toplam Ders Saati</div>
+                        <div style="color: var(--dark); font-weight: 700; font-size: 22px;">${hours.toFixed(1)}h</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05)); padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-light); font-size: 12px; margin-bottom: 5px;">Toplam Kazanç</div>
+                        <div style="color: var(--dark); font-weight: 700; font-size: 22px;">₺${amount.toFixed(2)}</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: rgba(16, 185, 129, 0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--success);">
+                        <div style="color: var(--text-light); font-size: 11px; text-transform: uppercase; margin-bottom: 5px;">Ödenen</div>
+                        <div style="color: var(--success); font-weight: 700;">₺${paid.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--warning);">
+                        <div style="color: var(--text-light); font-size: 11px; text-transform: uppercase; margin-bottom: 5px;">Beklemede</div>
+                        <div style="color: var(--warning); font-weight: 700;">₺${unpaid.toFixed(2)}</div>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--dark); margin-bottom: 10px; margin-top: 20px; font-size: 14px;">Dersleri:</h4>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    ${lessons.length === 0 ? '<p style="color: var(--text-light);">Henüz ders kaydı yok</p>' : ''}
+                    ${lessons.map(lesson => `
+                        <div style="padding: 10px; background: var(--light); border-radius: 6px; margin-bottom: 8px; font-size: 12px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong>${new Date(lesson.date).toLocaleDateString('tr-TR')}</strong>
+                                <span style="color: var(--dark); font-weight: 600;">₺${lesson.amount.toFixed(2)}</span>
+                            </div>
+                            <div style="color: var(--text-light);">
+                                ${lesson.startTime} - ${lesson.endTime} (${lesson.hours.toFixed(1)}h)
+                                ${lesson.notes ? ' • ' + lesson.notes : ''}
+                            </div>
+                            ${lesson.paid ? '<div style="color: var(--success); margin-top: 5px;">✓ Ödendi</div>' : '<div style="color: var(--warning); margin-top: 5px;">⏱ Beklemede</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <button class="btn btn-secondary" onclick="closeModal()" style="width: 100%; margin-top: 20px;">Kapat</button>
+            `;
+
+            document.getElementById('modal-title').textContent = student.name + ' - Detayları';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('student-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('student-modal').classList.remove('active');
+        }
+
+        // INITIALIZE
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            updateUI();
+
+            // Set today's date as default
+            document.getElementById('lesson-date').valueAsDate = new Date();
+
+            // Prevent zooming on input focus (iOS)
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    document.body.style.zoom = 1;
+                });
+            });
+
+            // Close modal on background click
+            document.getElementById('student-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'student-modal') {
+                    closeModal();
+                }
+            });
+        });
+
+        // Auto-save every change
+        window.addEventListener('beforeunload', saveData);
+
+        // Handle visibility change (save when leaving tab)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                saveData();
+            }
+        });
+
+        // PWA - Install prompt for iOS
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Hide the mini-infobar for now
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
