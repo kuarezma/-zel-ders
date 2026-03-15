@@ -813,10 +813,6 @@
                                     <input type="number" id="lesson-hours" required placeholder="1" min="0.25" step="0.25">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Ders Açıklaması (Opsiyonel)</label>
-                                <input type="text" id="lesson-notes" placeholder="Örn: Matematik - Türev">
-                            </div>
                             <button type="submit" class="btn btn-primary" style="width: 100%;">
                                 <i class="fas fa-plus"></i> Ders Ekle
                             </button>
@@ -841,7 +837,7 @@
                         <div class="form-group" style="margin: 0;">
                             <label style="font-size: 12px;">Ödeme Durumu</label>
                             <select id="filter-status" onchange="filterLessons()">
-                                <option value="">Tüm Öğdemeler</option>
+                                <option value="">Tüm Dersler</option>
                                 <option value="paid">Ödenen Dersler</option>
                                 <option value="unpaid">Ödenmemiş Dersler</option>
                             </select>
@@ -1030,7 +1026,6 @@
             const date = document.getElementById('lesson-date').value;
             const hours = parseFloat(document.getElementById('lesson-hours').value);
             const rate = parseFloat(document.getElementById('lesson-rate').value);
-            const notes = document.getElementById('lesson-notes').value;
 
             if (!studentId || !date || !hours || hours <= 0 || rate < 0) return;
 
@@ -1041,7 +1036,6 @@
                 hours: parseFloat(hours.toFixed(2)),
                 hourlyRate: rate,
                 amount: parseFloat((hours * rate).toFixed(2)),
-                notes,
                 paid: false,
                 paidAt: null
             };
@@ -1119,6 +1113,7 @@
         function updateStudentDropdown() {
             const select = document.getElementById('lesson-student');
             const filterSelect = document.getElementById('filter-student');
+            const filterValue = filterSelect.value;
 
             select.innerHTML = '<option value="">-- Öğrenci Seçin --</option>';
             filterSelect.innerHTML = '<option value="">Tüm Öğrenciler</option>';
@@ -1134,6 +1129,8 @@
                 filterOption.textContent = student.name;
                 filterSelect.appendChild(filterOption);
             });
+
+            filterSelect.value = filterValue;
         }
 
         function updateStudentsList() {
@@ -1373,7 +1370,6 @@
                             </div>
                             <div style="color: var(--text-light);">
                                 ${lesson.hours.toFixed(1)}h
-                                ${lesson.notes ? ' • ' + lesson.notes : ''}
                             </div>
                             ${lesson.paid ? '<div style="color: var(--success); margin-top: 5px;">✓ Ödendi</div>' : '<div style="color: var(--warning); margin-top: 5px;">⏱ Beklemede</div>'}
                         </div>
